@@ -2,6 +2,7 @@ import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/context/auth-context";
 import Navbar from "@/components/common/navbar";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -29,8 +30,10 @@ export default function RootLayout({
         className={`${plusJakarta.variable} ${playfair.variable} font-sans`}
       >
         <AuthProvider>
-          <Navbar />
-          {children}
+          <ErrorBoundary>
+            <Navbar />
+            {children}
+          </ErrorBoundary>
         </AuthProvider>
       </body>
     </html>

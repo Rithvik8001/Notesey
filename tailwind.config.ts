@@ -47,9 +47,29 @@ const config: Config = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "none",
+            color: "inherit",
+            a: {
+              color: "#0ea5e9",
+              "&:hover": {
+                color: "#0369a1",
+              },
+            },
+            code: {
+              color: "inherit",
+              background: "rgba(0, 0, 0, 0.1)",
+              borderRadius: "0.25rem",
+              padding: "0.25rem",
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
 
 export default config;
