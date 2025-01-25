@@ -9,10 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "firebase": "^11.2.0",
+    "framer": "^2.4.1",
+    "framer-motion": "^12.0.5",
+    "motion": "^12.0.5",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
     "@types/node": "^20",
