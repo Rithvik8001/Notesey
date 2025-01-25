@@ -1,4 +1,5 @@
 import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { AuthProvider } from "@/lib/context/auth-context";
 import Navbar from "@/components/common/navbar";
 import "./globals.css";
 
@@ -27,8 +28,10 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.variable} ${playfair.variable} font-sans`}
       >
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <Navbar />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

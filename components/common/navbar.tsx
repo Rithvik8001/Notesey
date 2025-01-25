@@ -2,9 +2,19 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/lib/context/auth-context";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   return (
     <motion.nav
@@ -27,22 +37,44 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden sm:flex items-center space-x-4">
-            <motion.div whileHover={{ y: -2 }}>
-              <Link
-                href="/login"
-                className="text-gray-600 hover:text-primary-600 transition-colors"
-              >
-                Login
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/register"
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-all"
-              >
-                Sign Up
-              </Link>
-            </motion.div>
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-gray-600 hover:text-primary-600 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-600 hover:text-primary-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <motion.div whileHover={{ y: -2 }}>
+                  <Link
+                    href="/login"
+                    className="text-gray-600 hover:text-primary-600 transition-colors"
+                  >
+                    Login
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    href="/register"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-all"
+                  >
+                    Sign Up
+                  </Link>
+                </motion.div>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
