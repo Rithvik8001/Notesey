@@ -1,16 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { app } from "@/lib/firebase/firebase";
+import type { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -27,44 +17,56 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const auth = getAuth(app);
   const router = useRouter();
+  const [auth, setAuth] = useState<any>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
+    const initAuth = async () => {
+      const { getAuth } = await import("firebase/auth");
+      const { app } = await import("@/lib/firebase/firebase");
+      const authInstance = getAuth(app);
+      setAuth(authInstance);
 
-      // Set auth cookie when user is logged in
-      if (user) {
-        const idToken = await user.getIdToken();
-        // Store the token in a cookie
-        document.cookie = `auth=${idToken}; path=/`;
-        router.push("/dashboard");
-      } else {
-        // Remove the cookie when user is logged out
-        document.cookie =
-          "auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
-      }
+      return authInstance.onAuthStateChanged(async (user) => {
+        setUser(user);
+        setLoading(false);
+
+        if (user) {
+          const idToken = await user.getIdToken();
+          document.cookie = `auth=${idToken}; path=/`;
+          router.push("/dashboard");
+        } else {
+          document.cookie =
+            "auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+        }
+      });
+    };
+
+    initAuth().then((unsubscribe) => {
+      return () => unsubscribe();
     });
-
-    return () => unsubscribe();
-  }, [auth, router]);
+  }, [router]);
 
   const signIn = async (email: string, password: string) => {
+    const { signInWithEmailAndPassword } = await import("firebase/auth");
     await signInWithEmailAndPassword(auth, email, password);
   };
 
   const signUp = async (email: string, password: string) => {
+    const { createUserWithEmailAndPassword } = await import("firebase/auth");
     await createUserWithEmailAndPassword(auth, email, password);
   };
 
   const signInWithGoogle = async () => {
+    const { GoogleAuthProvider, signInWithPopup } = await import(
+      "firebase/auth"
+    );
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
   };
 
   const logout = async () => {
+    const { signOut } = await import("firebase/auth");
     await signOut(auth);
     router.push("/");
   };
