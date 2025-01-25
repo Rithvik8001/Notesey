@@ -1,33 +1,55 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Deny all reads and writes by default
-    match /{document=**} {
-      allow read: if false;
-      allow write: if false;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    // Validate chat messages
+    function isUserAuthenticated(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Chat messages rules
     match /chats/{userId}/messages/{messageId} {
-      // Common validation functions
       function isValidMessage() {
         let data = request.resource.data;
         return data.keys().hasAll(['content', 'role', 'timestamp'])
           && data.content is string
-          && data.content.size() <= 1000  // Max 1000 characters
+          && data.content.size() <= 1000
           && data.role in ['user', 'assistant']
           && data.timestamp is timestamp;
       }
 
-      function isOwner() {
-        return request.auth != null && request.auth.uid == userId;
+      allow read: if isUserAuthenticated(userId);
+      allow create: if isUserAuthenticated(userId) && isValidMessage();
+      allow update: if false;
+      allow delete: if isUserAuthenticated(userId);
+    }
+
+    // Notes rules
+    match /notes/{noteId} {
+      function isValidNote() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['title', 'content', 'userId', 'createdAt', 'updatedAt'])
+          && data.title is string
+          && data.title.size() <= 200
+          && data.content is string
+          && data.content.size() <= 50000
+          && data.userId is string
+          && data.createdAt is timestamp
+          && data.updatedAt is timestamp;
       }
 
-      // Rules
-      allow read: if isOwner();
-      allow create: if isOwner() && isValidMessage();
-      allow update: if false;  // Messages cannot be edited
-      allow delete: if isOwner();
+      allow read: if isUserAuthenticated(resource.data.userId);
+      allow create: if isUserAuthenticated(request.resource.data.userId) && isValidNote();
+      allow update: if isUserAuthenticated(resource.data.userId) && isValidNote();
+      allow delete: if isUserAuthenticated(resource.data.userId);
+    }
+
+    // Lock down all other paths
+    match /{path=**} {
+      allow read, write: if false;
     }
   }
 }

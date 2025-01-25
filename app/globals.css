@@ -1,3 +1,90 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* TipTap Base Styles */
+.ProseMirror {
+  @apply min-h-[200px] outline-none p-4;
+}
+
+.ProseMirror > * + * {
+  @apply mt-4;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+  content: attr(data-placeholder);
+}
+
+/* Headings */
+.ProseMirror h1 {
+  @apply text-3xl font-bold;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-bold;
+}
+
+/* Lists */
+.ProseMirror ul {
+  @apply list-disc pl-4;
+}
+
+.ProseMirror ol {
+  @apply list-decimal pl-4;
+}
+
+/* Code Blocks */
+.ProseMirror pre {
+  @apply bg-gray-900 text-white rounded-lg p-4 my-4 overflow-x-auto;
+}
+
+.ProseMirror code {
+  @apply bg-gray-100 text-gray-900 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.ProseMirror pre code {
+  @apply bg-transparent text-inherit p-0 text-sm leading-relaxed;
+}
+
+/* Text Formatting */
+.ProseMirror strong {
+  @apply font-bold;
+}
+
+.ProseMirror em {
+  @apply italic;
+}
+
+/* Links */
+.ProseMirror a {
+  @apply text-primary-600 hover:text-primary-700 underline;
+}
+
+/* Editor Focus States */
+.ProseMirror:focus {
+  @apply outline-none;
+}
+
+/* Toolbar Styles */
+.editor-toolbar {
+  @apply flex flex-wrap gap-1 p-2 border-b border-gray-200;
+}
+
+.editor-toolbar button {
+  @apply p-2 rounded hover:bg-gray-100 text-gray-600 transition-colors;
+}
+
+.editor-toolbar button.is-active {
+  @apply bg-gray-100 text-primary-600;
+}
+
+/* Content Container */
+.editor-content {
+  @apply prose prose-sm max-w-none h-full overflow-y-auto;
+}

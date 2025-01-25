@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-plus-jakarta)"],
+      },
       colors: {
         primary: {
           50: "#fff7ed",
@@ -18,6 +21,8 @@ const config: Config = {
           500: "#f97316",
           600: "#ea580c",
           700: "#c2410c",
+          800: "#9a3412",
+          900: "#7c2d12",
         },
         secondary: {
           50: "#f0f9ff",
@@ -40,10 +45,6 @@ const config: Config = {
           700: "#334155",
         },
       },
-      fontFamily: {
-        sans: ["var(--font-plus-jakarta)"],
-        logo: ["var(--font-playfair)"],
-      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
@@ -51,18 +52,13 @@ const config: Config = {
         DEFAULT: {
           css: {
             maxWidth: "none",
-            color: "inherit",
+            color: "#333",
+            fontFamily: "var(--font-plus-jakarta)",
             a: {
-              color: "#0ea5e9",
+              color: "#ea580c",
               "&:hover": {
-                color: "#0369a1",
+                color: "#c2410c",
               },
-            },
-            code: {
-              color: "inherit",
-              background: "rgba(0, 0, 0, 0.1)",
-              borderRadius: "0.25rem",
-              padding: "0.25rem",
             },
           },
         },

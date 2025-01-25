@@ -13,13 +13,15 @@ import {
   Menu,
   X,
   Home,
+  Edit3,
+  Clock,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Q&A Chat", href: "/dashboard/chat", icon: MessageSquare },
-  { name: "Smart Summaries", href: "/dashboard/summaries", icon: BookOpen },
-  { name: "Practice Quizzes", href: "/dashboard/quizzes", icon: Brain },
+  { name: "Study Notes", href: "/dashboard/notes", icon: Edit3 },
+  { name: "Focus Timer", href: "/dashboard/timer", icon: Clock },
   { name: "History", href: "/dashboard/history", icon: History },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

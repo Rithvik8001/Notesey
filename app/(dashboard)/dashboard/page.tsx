@@ -2,29 +2,29 @@
 import { useAuth } from "@/lib/context/auth-context";
 import PageHeader from "@/components/dashboard/page-header";
 import ActionCard from "@/components/dashboard/action-card";
-import { MessageSquare, BookOpen, Brain } from "lucide-react";
+import { MessageSquare, Edit3, Clock } from "lucide-react";
 
 const actions = [
   {
-    title: "Ask Questions",
+    title: "Interactive Q&A",
     description:
       "Get instant answers to your academic questions with our AI assistant",
     icon: MessageSquare,
     href: "/dashboard/chat",
   },
   {
-    title: "Generate Summaries",
+    title: "Study Notes",
     description:
-      "Upload your study materials and get concise, easy-to-understand summaries",
-    icon: BookOpen,
-    href: "/dashboard/summaries",
+      "Take and organize your study notes with our powerful rich text editor",
+    icon: Edit3,
+    href: "/dashboard/notes",
   },
   {
-    title: "Practice with Quizzes",
+    title: "Focus Timer",
     description:
-      "Test your knowledge with AI-generated quizzes based on your materials",
-    icon: Brain,
-    href: "/dashboard/quizzes",
+      "Stay productive with our customizable Pomodoro timer and session tracking",
+    icon: Clock,
+    href: "/dashboard/timer",
   },
 ];
 

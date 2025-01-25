@@ -76,6 +76,7 @@ export default function ChatContainer() {
 
     if (!user || !input.trim() || isLoading || isProcessing) return;
 
+    const tempId = Date.now().toString();
     try {
       setIsLoading(true);
       setIsProcessing(true);
@@ -89,9 +90,14 @@ export default function ChatContainer() {
       };
 
       setInput("");
-      const tempId = Date.now().toString();
       setMessages((prev) => [...prev, { ...newMessage, id: tempId }]);
-      const messageId = await saveChatMessage(user.uid, newMessage);
+      let messageId;
+      try {
+        messageId = await saveChatMessage(user.uid, newMessage);
+      } catch (error) {
+        setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+        throw error;
+      }
 
       setMessages((prev) =>
         prev.map((msg) => (msg.id === tempId ? { ...msg, id: messageId } : msg))
@@ -126,11 +132,20 @@ export default function ChatContainer() {
         userId: user.uid,
       };
 
-      const aiMessageId = await saveChatMessage(user.uid, aiMessage);
-      setMessages((prev) => [...prev, { ...aiMessage, id: aiMessageId }]);
+      try {
+        const aiMessageId = await saveChatMessage(user.uid, aiMessage);
+        setMessages((prev) => [...prev, { ...aiMessage, id: aiMessageId }]);
+      } catch (error) {
+        throw new Error("Failed to save AI response");
+      }
+
       setLastMessageTime(new Date());
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while processing your message"
+      );
     } finally {
       setIsLoading(false);
       setIsProcessing(false);
