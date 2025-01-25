@@ -10,6 +10,43 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Focus sessions rules
+    match /focusSessions/{sessionId} {
+      function isValidSession() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['userId', 'duration', 'type', 'startTime', 'endTime'])
+          && data.userId is string
+          && data.duration is number
+          && data.type in ['work', 'break']
+          && data.startTime is timestamp
+          && data.endTime is timestamp
+          && (!data.keys().hasAny(['taskId']) || data.taskId == null || data.taskId is string);
+      }
+
+      allow read: if isUserAuthenticated(resource.data.userId);
+      allow create: if isUserAuthenticated(request.resource.data.userId) && isValidSession();
+      allow update: if false;
+      allow delete: if isUserAuthenticated(resource.data.userId);
+    }
+
+    // Focus tasks rules
+    match /focusTasks/{taskId} {
+      function isValidTask() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['userId', 'title', 'completed', 'createdAt'])
+          && data.userId is string
+          && data.title is string
+          && data.title.size() <= 200
+          && data.completed is bool
+          && data.createdAt is timestamp;
+      }
+
+      allow read: if isUserAuthenticated(resource.data.userId);
+      allow create: if isUserAuthenticated(request.resource.data.userId) && isValidTask();
+      allow update: if isUserAuthenticated(resource.data.userId) && isValidTask();
+      allow delete: if isUserAuthenticated(resource.data.userId);
+    }
+
     // Chat messages rules
     match /chats/{userId}/messages/{messageId} {
       function isValidMessage() {

@@ -1,8 +1,12 @@
 export interface Note {
-  id?: string;
+  id: string;
+  userId: string;
   title: string;
   content: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: {
+    toDate: () => Date;
+  };
+  updatedAt: {
+    toDate: () => Date;
+  };
 }

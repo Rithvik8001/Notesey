@@ -8,7 +8,6 @@ import {
   MessageSquare,
   BookOpen,
   Brain,
-  History,
   Settings,
   Menu,
   X,
@@ -22,7 +21,6 @@ const navigation = [
   { name: "Q&A Chat", href: "/dashboard/chat", icon: MessageSquare },
   { name: "Study Notes", href: "/dashboard/notes", icon: Edit3 },
   { name: "Focus Timer", href: "/dashboard/timer", icon: Clock },
-  { name: "History", href: "/dashboard/history", icon: History },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

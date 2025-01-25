@@ -23,20 +23,20 @@ export async function getUserNotes(userId: string) {
     const q = query(
       notesRef,
       where("userId", "==", userId),
-      orderBy("updatedAt", "desc")
+      orderBy("createdAt", "desc")
     );
     const querySnapshot = await getDocs(q);
 
     return querySnapshot.docs.map((doc) => {
-      const data = doc.data() as DocumentData;
+      const data = doc.data();
       return {
         id: doc.id,
-        title: data.title as string,
-        content: data.content as string,
-        userId: data.userId as string,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
-      } as Note;
+        title: data.title,
+        content: data.content,
+        userId: data.userId,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
     });
   } catch (error) {
     console.error("Error getting notes:", error);
@@ -97,5 +97,25 @@ export async function deleteNote(noteId: string) {
   } catch (error) {
     console.error("Error deleting note:", error);
     throw new Error("Failed to delete note");
+  }
+}
+
+export async function getNotes(userId: string) {
+  try {
+    const notesRef = collection(db, "notes");
+    const q = query(
+      notesRef,
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Note[];
+  } catch (error) {
+    console.error("Error getting notes:", error);
+    throw new Error("Failed to load notes");
   }
 }
