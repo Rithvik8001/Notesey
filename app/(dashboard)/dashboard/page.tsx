@@ -13,6 +13,7 @@ import { getSessions } from "@/lib/firebase/timer";
 import { getUserNotes } from "@/lib/firebase/notes";
 import PageHeader from "@/components/dashboard/page-header";
 import Link from "next/link";
+import type { FirestoreNote } from "@/lib/types/notes";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -56,7 +57,7 @@ export default function DashboardPage() {
         }
 
         const recentNotes = notes.filter(
-          (note) => note.createdAt.toDate() >= startDate
+          (note: FirestoreNote) => note.createdAt.toDate() >= startDate
         );
 
         setStats({

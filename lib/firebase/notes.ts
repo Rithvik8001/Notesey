@@ -14,9 +14,9 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import type { Note } from "@/lib/types/notes";
+import type { Note, FirestoreNote } from "@/lib/types/notes";
 
-export async function getUserNotes(userId: string) {
+export async function getUserNotes(userId: string): Promise<FirestoreNote[]> {
   const notesRef = collection(db, "notes");
 
   try {
@@ -46,8 +46,8 @@ export async function getUserNotes(userId: string) {
 
 export async function createNote(
   userId: string,
-  note: Omit<Note, "id" | "userId">
-) {
+  note: Omit<Note, "id">
+): Promise<string> {
   try {
     const notesRef = collection(db, "notes");
     const noteData = {
@@ -59,18 +59,7 @@ export async function createNote(
     };
 
     const docRef = await addDoc(notesRef, noteData);
-
-    const newNoteSnap = await getDoc(docRef);
-    const newNoteData = newNoteSnap.data() as DocumentData;
-
-    return {
-      id: docRef.id,
-      title: newNoteData?.title || note.title,
-      content: newNoteData?.content || note.content,
-      userId,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-    } as Note;
+    return docRef.id;
   } catch (error) {
     console.error("Error creating note:", error);
     throw new Error("Failed to create note");

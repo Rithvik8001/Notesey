@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/lib/context/auth-context";
 import { Plus, Trash2, X, Search } from "lucide-react";
 import { getUserNotes, createNote, deleteNote } from "@/lib/firebase/notes";
-import type { Note } from "@/lib/types/notes";
+import type { Note, FirestoreNote } from "@/lib/types/notes";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NotesListProps {
@@ -29,9 +29,15 @@ export default function NotesList({
 
     try {
       setLoading(true);
-      const userNotes = await getUserNotes(user.uid);
-      setNotes(userNotes);
-      setFilteredNotes(userNotes);
+      const data = await getUserNotes(user.uid);
+      // Convert Firestore timestamps to Dates
+      const formattedNotes = data.map((note) => ({
+        ...note,
+        createdAt: note.createdAt.toDate(),
+        updatedAt: note.updatedAt.toDate(),
+      }));
+      setNotes(formattedNotes);
+      setFilteredNotes(formattedNotes);
     } catch (error) {
       console.error("Failed to load notes:", error);
       setError("Unable to load notes. Please try again later.");
@@ -65,14 +71,15 @@ export default function NotesList({
     if (!user) return;
 
     try {
-      const newNote = await createNote(user.uid, {
+      const newNote: Omit<Note, "id"> = {
+        userId: user.uid,
         title: "Untitled Note",
         content: "",
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
-      setNotes((prev) => [newNote, ...prev]);
-      onNoteSelect(newNote.id!);
+      };
+      const noteId = await createNote(user.uid, newNote);
+      setNotes((prev) => [{ ...newNote, id: noteId }, ...prev]);
     } catch (error) {
       console.error("Failed to create note:", error);
     }

@@ -3,10 +3,11 @@ export interface Note {
   userId: string;
   title: string;
   content: string;
-  createdAt: {
-    toDate: () => Date;
-  };
-  updatedAt: {
-    toDate: () => Date;
-  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface FirestoreNote extends Omit<Note, "createdAt" | "updatedAt"> {
+  createdAt: { toDate: () => Date };
+  updatedAt: { toDate: () => Date };
 }
