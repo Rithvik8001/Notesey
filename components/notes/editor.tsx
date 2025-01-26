@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/context/auth-context";
-import { updateNote } from "@/lib/firebase/notes";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/firebase";
+import { updateNote, getNote } from "@/lib/firebase/notes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -35,24 +33,51 @@ export default function NotesEditor({
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      Placeholder.configure({
+        placeholder: "Start writing your note...",
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setContent(html);
+      setHasChanges(true);
+    },
+    editorProps: {
+      attributes: {
+        class: "prose prose-sm max-w-none focus:outline-none",
+      },
+    },
+    enableInputRules: false,
+    enablePasteRules: false,
+    immediatelyRender: false,
+  });
+
   // Load note content when noteId changes
   useEffect(() => {
     const loadNote = async () => {
       if (!noteId) {
         setTitle("");
         setContent("");
+        editor?.commands.setContent("");
         return;
       }
 
       try {
         setLoading(true);
-        const noteRef = doc(db, "notes", noteId);
-        const noteSnap = await getDoc(noteRef);
-
-        if (noteSnap.exists()) {
-          const data = noteSnap.data();
-          setTitle(data.title);
-          setContent(data.content);
+        const note = await getNote(noteId);
+        if (note) {
+          setTitle(note.title);
+          setContent(note.content);
+          editor?.commands.setContent(note.content);
           setHasChanges(false);
         }
       } catch (error) {
@@ -63,7 +88,7 @@ export default function NotesEditor({
     };
 
     loadNote();
-  }, [noteId]);
+  }, [noteId, editor]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -71,58 +96,23 @@ export default function NotesEditor({
   };
 
   const handleSave = async () => {
-    if (!noteId || !user || !hasChanges) return;
+    if (!user || !noteId || !hasChanges) return;
 
     try {
       setSaving(true);
-      setSaved(false);
       await updateNote(noteId, {
         title,
         content: editor?.getHTML() || "",
       });
-      setHasChanges(false);
-      setSaving(false);
       setSaved(true);
-      // Hide "Saved" message after 2 seconds
-      setTimeout(() => {
-        setSaved(false);
-      }, 2000);
+      setHasChanges(false);
+      setTimeout(() => setSaved(false), 2000);
     } catch (error) {
       console.error("Failed to save note:", error);
+    } finally {
       setSaving(false);
     }
   };
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-        codeBlock: false,
-      }),
-      Placeholder.configure({
-        placeholder: "Start writing your note...",
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-        defaultLanguage: "plaintext",
-      }),
-    ],
-    content: content || "",
-    onUpdate: () => {
-      setHasChanges(true);
-    },
-    editorProps: {
-      attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none",
-      },
-    },
-    // Add these options to fix SSR issues
-    enableInputRules: false,
-    enablePasteRules: false,
-    immediatelyRender: false,
-  });
 
   if (!noteId) {
     return (

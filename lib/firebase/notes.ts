@@ -52,7 +52,7 @@ export async function createNote(
     const notesRef = collection(db, "notes");
     const noteData = {
       title: note.title,
-      content: note.content,
+      content: note.content || "",
       userId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -69,10 +69,16 @@ export async function createNote(
 export async function updateNote(noteId: string, updates: Partial<Note>) {
   try {
     const noteRef = doc(db, "notes", noteId);
-    await updateDoc(noteRef, {
+    const updateData = {
       ...updates,
       updatedAt: serverTimestamp(),
-    });
+    };
+
+    if (!updateData.content && updates.content !== "") {
+      updateData.content = "";
+    }
+
+    await updateDoc(noteRef, updateData);
   } catch (error) {
     console.error("Error updating note:", error);
     throw new Error("Failed to update note");
@@ -89,22 +95,26 @@ export async function deleteNote(noteId: string) {
   }
 }
 
-export async function getNotes(userId: string) {
+export async function getNote(noteId: string): Promise<FirestoreNote | null> {
   try {
-    const notesRef = collection(db, "notes");
-    const q = query(
-      notesRef,
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
+    const noteRef = doc(db, "notes", noteId);
+    const noteSnap = await getDoc(noteRef);
 
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Note[];
+    if (!noteSnap.exists()) {
+      return null;
+    }
+
+    const data = noteSnap.data();
+    return {
+      id: noteSnap.id,
+      title: data.title,
+      content: data.content || "",
+      userId: data.userId,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   } catch (error) {
-    console.error("Error getting notes:", error);
-    throw new Error("Failed to load notes");
+    console.error("Error getting note:", error);
+    throw new Error("Failed to load note");
   }
 }

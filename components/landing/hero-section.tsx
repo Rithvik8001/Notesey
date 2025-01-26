@@ -48,8 +48,9 @@ function HeroContent() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="text-lg sm:text-xl text-gray-600 mb-8 max-w-xl sm:max-w-2xl mx-auto px-4 sm:px-0"
       >
-        Your AI-powered study companion that helps you understand, memorize, and
-        master any subject matter in record time.
+        Transform your study sessions with AI-powered Q&A, smart note-taking,
+        and focused study timers. Get instant answers, organize your thoughts,
+        and stay productive all in one place.
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
